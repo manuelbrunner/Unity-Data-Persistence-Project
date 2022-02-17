@@ -11,21 +11,23 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HighScoreText;
     public GameObject GameOverText;
-    
+    public GameManager gm;
+
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -36,6 +38,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        ShowHighScore(gm.highScore);
     }
 
     private void Update()
@@ -60,6 +64,10 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            SceneManager.LoadScene("menu");
+        }
     }
 
     void AddPoint(int point)
@@ -72,5 +80,15 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        gm.Save(m_Points);
+    }
+
+    private void ShowHighScore(GameManager.HighScore hs)
+    {
+       if (hs == null)
+        {
+            hs = new GameManager.HighScore();
+        }
+        HighScoreText.text = $"High Score: {hs.score} ({hs.name})";
     }
 }
